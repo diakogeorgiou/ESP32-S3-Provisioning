@@ -1,539 +1,195 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>HealthLink Gateway Web Provisioning</title>
-
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: #f4f6f9;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .card {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 450px;
-        }
-
-        h2 {
-            margin-top: 0;
-            color: #1e293b;
-        }
-
-        label {
-            display: block;
-            margin-top: 15px;
-            font-weight: 600;
-            font-size: 14px;
-            color: #475569;
-        }
-
-        input,
-        select {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            box-sizing: border-box;
-        }
-
-        button {
-            width: 100%;
-            margin-top: 25px;
-            padding: 12px;
-            background: #2563eb;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background: #1d4ed8;
-        }
-
-        button:disabled {
-            background: #94a3b8;
-            cursor: not-allowed;
-        }
-
-        .status {
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 6px;
-            font-size: 14px;
-            text-align: center;
-            display: none;
-        }
-
-        .status.info {
-            background: #dbeafe;
-            color: #1e40af;
-            display: block;
-        }
-
-        .status.success {
-            background: #dcfce7;
-            color: #166534;
-            display: block;
-        }
-
-        .status.error {
-            background: #fee2e2;
-            color: #991b1b;
-            display: block;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Call-In Relay Web Provisioning</title>
+<style>
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f4f6f9;margin:0;padding:20px;display:flex;justify-content:center}
+.card{background:white;padding:30px;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,.1);width:100%;max-width:450px}
+h2{margin-top:0;color:#1e293b}
+label{display:block;margin-top:15px;font-weight:600;font-size:14px;color:#475569}
+input,select{width:100%;padding:10px;margin-top:5px;border:1px solid #cbd5e1;border-radius:6px;box-sizing:border-box}
+button{width:100%;margin-top:25px;padding:12px;background:#2563eb;color:white;border:none;border-radius:6px;font-size:16px;font-weight:600;cursor:pointer}
+button:hover{background:#1d4ed8}
+button:disabled{background:#94a3b8;cursor:not-allowed}
+.status{margin-top:15px;padding:10px;border-radius:6px;font-size:14px;text-align:center;display:none}
+.status.info{background:#dbeafe;color:#1e40af;display:block}
+.status.success{background:#dcfce7;color:#166534;display:block}
+.status.error{background:#fee2e2;color:#991b1b;display:block}
+#wifiFields{display:block}
+</style>
 </head>
 
 <body>
-    <div class="card">
-        <h2>Device Provisioning</h2>
-        <p style="font-size: 14px; color: #64748b;">
-            Connect to your HealthLink Gateway over BLE to configure
-            network & API settings.
-        </p>
-        <div id="statusBox" class="status"></div>
-        <label for="blePrefix">
-            BLE Name Prefix
-        </label>
 
-        <input type="text" id="blePrefix" value="HL_">
+<div class="card">
+<h2>Device Provisioning</h2>
 
+<p style="font-size:14px;color:#64748b">
+Connect to your Call-In Relay over BLE to configure network & API settings.
+</p>
 
-        <label for="netMode">
-            Network Mode
-        </label>
+<div id="statusBox" class="status"></div>
 
-        <select id="netMode">
+<label for="blePrefix">BLE Name Prefix</label>
+<input type="text" id="blePrefix" value="HL_">
 
-            <option value="WIFI">
-                Wi-Fi Mode
-            </option>
+<label for="netMode">Network Mode</label>
+<select id="netMode" onchange="updateNetworkFields()">
+<option value="WIFI">Wi-Fi Mode</option>
+<option value="ETHERNET">Ethernet Mode (W5500)</option>
+</select>
 
-            <option value="ETHERNET">
-                Ethernet Mode (W5500)
-            </option>
+<div id="wifiFields">
 
-        </select>
+<label for="wifiSsid">Wi-Fi Network</label>
+<input type="text" id="wifiSsid" placeholder="Wi-Fi SSID">
 
-        <label for="apiUser">
-            API Username
-        </label>
+<label for="wifiPass">Wi-Fi Password</label>
+<input type="password" id="wifiPass" placeholder="Wi-Fi password">
 
-        <input type="text" id="apiUser" value="device1">
+</div>
 
-        <label for="apiPass">
-            API Password
-        </label>
+<label for="apiUser">API Username</label>
+<input type="text" id="apiUser" value="device1">
 
-        <input type="password" id="apiPass" value="P0rtl4nd!">
+<label for="apiPass">API Password</label>
+<input type="password" id="apiPass" value="P0rtl4nd!">
 
-        <button id="btnConnect" onclick="startProvisioning()">
-            Connect & Send Custom Settings
-        </button>
+<button id="btnConnect" onclick="startProvisioning()">Connect & Send Custom Settings</button>
+</div>
 
-    </div>
+<script>
+const ESP_PROV_SERVICE_UUID='021a9004-0382-4aea-bff4-6b3f1c5adfb4';
+const CUD_DESCRIPTOR_UUID='00002901-0000-1000-8000-00805f9b34fb';
+const CUSTOM_ENDPOINT_NAME='custom-config';
 
+function updateNetworkFields(){
+    const mode=document.getElementById('netMode').value;
+    document.getElementById('wifiFields').style.display=mode==='WIFI'?'block':'none';
+}
 
-    <script>
+async function getEndpointName(characteristic){
+    try{
+        const descriptor=await characteristic.getDescriptor(CUD_DESCRIPTOR_UUID);
+        const value=await descriptor.readValue();
+        return new TextDecoder().decode(value);
+    }catch(error){
+        return null;
+    }
+}
 
-        // ============================================================
-        // Espressif BLE Provisioning Service
-        // ============================================================
+async function startProvisioning(){
+    const prefix=document.getElementById('blePrefix').value.trim();
+    const netMode=document.getElementById('netMode').value;
+    const wifiSsid=document.getElementById('wifiSsid').value;
+    const wifiPass=document.getElementById('wifiPass').value;
+    const apiUser=document.getElementById('apiUser').value;
+    const apiPass=document.getElementById('apiPass').value;
+    const button=document.getElementById('btnConnect');
 
-        const ESP_PROV_SERVICE_UUID =
-            '021a9004-0382-4aea-bff4-6b3f1c5adfb4';
+    if(!navigator.bluetooth){
+        showStatus('Web Bluetooth is not supported in this browser.','error');
+        return;
+    }
 
-        const CUD_DESCRIPTOR_UUID =
-            '00002901-0000-1000-8000-00805f9b34fb';
+    if(netMode==='WIFI'&&!wifiSsid){
+        showStatus('Please enter the Wi-Fi network name.','error');
+        return;
+    }
 
-        const CUSTOM_ENDPOINT_NAME =
-            'custom-config';
+    try{
+        button.disabled=true;
 
+        showStatus('Scanning for BLE device...','info');
 
-        // ============================================================
-        // Read Characteristic User Description
-        // ============================================================
+        const device=await navigator.bluetooth.requestDevice({
+            filters:[{namePrefix:prefix}],
+            optionalServices:[ESP_PROV_SERVICE_UUID]
+        });
 
-        async function getEndpointName(characteristic) {
-            try {
+        console.log('[BLE] Device:',device.name);
 
-                const descriptor =
-                    await characteristic.getDescriptor(
-                        CUD_DESCRIPTOR_UUID
-                    );
+        showStatus(`Connecting to ${device.name}...`,'info');
 
-                const value =
-                    await descriptor.readValue();
+        const server=await device.gatt.connect();
 
-                const name =
-                    new TextDecoder().decode(value);
+        console.log('[BLE] GATT connected');
 
-                return name;
+        showStatus('Finding provisioning service...','info');
 
-            }
-            catch (error) {
+        const service=await server.getPrimaryService(ESP_PROV_SERVICE_UUID);
 
-                console.log(
-                    `[BLE] No 0x2901 descriptor for ${characteristic.uuid}:`,
-                    error.message
-                );
+        console.log('[BLE] Provisioning service:',service.uuid);
 
-                return null;
-            }
-        }
+        const characteristics=await service.getCharacteristics();
 
+        console.log('[BLE] Characteristics:',characteristics.length);
 
-        // ============================================================
-        // Start provisioning
-        // ============================================================
+        let customChar=null;
 
-        async function startProvisioning() {
-            const prefix =
-                document.getElementById('blePrefix').value.trim();
+        for(const characteristic of characteristics){
+            console.log('[BLE] Characteristic:',characteristic.uuid,characteristic.properties);
 
-            const netMode =
-                document.getElementById('netMode').value;
+            const endpointName=await getEndpointName(characteristic);
 
-            const apiUser =
-                document.getElementById('apiUser').value;
+            console.log('[BLE] Endpoint:',endpointName);
 
-            const apiPass =
-                document.getElementById('apiPass').value;
-
-            const button =
-                document.getElementById('btnConnect');
-
-
-            if (!navigator.bluetooth) {
-
-                showStatus(
-                    'Web Bluetooth is not supported in this browser.',
-                    'error'
-                );
-
-                return;
-            }
-
-
-            try {
-
-                button.disabled = true;
-
-
-                // ====================================================
-                // Scan
-                // ====================================================
-
-                showStatus(
-                    'Scanning for BLE device...',
-                    'info'
-                );
-
-
-                const device =
-                    await navigator.bluetooth.requestDevice({
-
-                        filters: [
-                            {
-                                namePrefix: prefix
-                            }
-                        ],
-
-                        optionalServices: [
-                            ESP_PROV_SERVICE_UUID
-                        ]
-                    });
-
-
-                console.log(
-                    '========================================'
-                );
-
-                console.log(
-                    '[BLE] Device:',
-                    device.name
-                );
-
-                console.log(
-                    '[BLE] Device ID:',
-                    device.id
-                );
-
-                console.log(
-                    '========================================'
-                );
-
-
-                // ====================================================
-                // Connect
-                // ====================================================
-
-                showStatus(
-                    `Connecting to ${device.name}...`,
-                    'info'
-                );
-
-
-                const server =
-                    await device.gatt.connect();
-
-
-                console.log(
-                    '[BLE] GATT connected'
-                );
-
-
-                // ====================================================
-                // Get provisioning service
-                // ====================================================
-
-                showStatus(
-                    'Finding Espressif provisioning service...',
-                    'info'
-                );
-
-
-                const service =
-                    await server.getPrimaryService(
-                        ESP_PROV_SERVICE_UUID
-                    );
-
-
-                console.log(
-                    '[BLE] Provisioning service:',
-                    service.uuid
-                );
-
-
-                // ====================================================
-                // Get all characteristics
-                // ====================================================
-
-                const characteristics =
-                    await service.getCharacteristics();
-
-
-                console.log(
-                    '========================================'
-                );
-
-                console.log(
-                    '[BLE] Provisioning characteristics:',
-                    characteristics.length
-                );
-
-                console.log(
-                    '========================================'
-                );
-
-
-                let customChar = null;
-
-
-                // ====================================================
-                // Inspect every characteristic
-                // ====================================================
-
-                for (
-                    const characteristic of characteristics
-                ) {
-
-                    console.log(
-                        '[BLE] Characteristic:',
-                        characteristic.uuid
-                    );
-
-                    console.log(
-                        '      Properties:',
-                        characteristic.properties
-                    );
-
-
-                    const endpointName =
-                        await getEndpointName(
-                            characteristic
-                        );
-
-
-                    console.log(
-                        '      Endpoint name:',
-                        endpointName
-                    );
-
-
-                    if (
-                        endpointName &&
-                        endpointName.trim() ===
-                        CUSTOM_ENDPOINT_NAME
-                    ) {
-
-                        console.log(
-                            '****************************************'
-                        );
-
-                        console.log(
-                            '[BLE] FOUND custom-config!'
-                        );
-
-                        console.log(
-                            '[BLE] UUID:',
-                            characteristic.uuid
-                        );
-
-                        console.log(
-                            '****************************************'
-                        );
-
-
-                        customChar =
-                            characteristic;
-
-                        break;
-                    }
-                }
-
-
-                // ====================================================
-                // Custom endpoint not found
-                // ====================================================
-
-                if (!customChar) {
-
-                    console.error(
-                        '========================================'
-                    );
-
-                    console.error(
-                        '[BLE] custom-config NOT FOUND'
-                    );
-
-                    console.error(
-                        '========================================'
-                    );
-
-
-                    showStatus(
-                        'Error: custom-config endpoint was not exposed by the ESP32.',
-                        'error'
-                    );
-
-
-                    return;
-                }
-
-
-                // ====================================================
-                // Prepare JSON
-                // ====================================================
-                const configData = {
-                    networkMode:
-                        netMode,
-                    apiUser:
-                        apiUser,
-                    apiPass:
-                        apiPass
-                };
-
-                const json =
-                    JSON.stringify(configData);
-
-                console.log(
-                    '[BLE] JSON:',
-                    JSON.stringify({
-                        networkMode: netMode,
-                        apiUser: apiUser,
-                        apiPass: '********'
-                    })
-                );
-
-                const payload =
-                    new TextEncoder().encode(json);
-
-                // ====================================================
-                // Send
-                // ====================================================
-                showStatus(
-                    'Sending custom JSON settings...',
-                    'info'
-                );
-
-                console.log(
-                    '[BLE] Writing to:',
-                    customChar.uuid
-                );
-
-                await customChar.writeValue(
-                    payload
-                );
-
-                // ====================================================
-                // Success
-                // ====================================================
-                console.log(
-                    '[BLE] Configuration sent successfully.'
-                );
-
-                showStatus(
-                    'Settings sent successfully! ESP32 saved config to NVS flash.',
-                    'success'
-                );
-            }
-            catch (error) {
-                console.error(
-                    '========================================'
-                );
-
-                console.error(
-                    '[BLE] Provisioning error:',
-                    error
-                );
-
-                console.error(
-                    '========================================'
-                );
-
-                showStatus(
-                    `Error: ${error.message}`,
-                    'error'
-                );
-            }
-            finally {
-                button.disabled = false;
+            if(endpointName&&endpointName.trim()===CUSTOM_ENDPOINT_NAME){
+                customChar=characteristic;
+                console.log('[BLE] custom-config found:',characteristic.uuid);
+                break;
             }
         }
 
-        // ============================================================
-        // Status
-        // ============================================================
-        function showStatus(
-            message,
-            type
-        ) {
-            const statusBox =
-                document.getElementById('statusBox');
-
-            statusBox.innerText =
-                message;
-
-            statusBox.className =
-                `status ${type}`;
+        if(!customChar){
+            showStatus('Error: custom-config endpoint was not exposed by the ESP32.','error');
+            return;
         }
-    </script>
+
+        const configData={
+            networkMode:netMode,
+            wifiSsid:wifiSsid,
+            wifiPass:wifiPass,
+            apiUser:apiUser,
+            apiPass:apiPass
+        };
+
+        console.log('[BLE] Sending configuration:',{
+            networkMode:netMode,
+            wifiSsid:wifiSsid,
+            wifiPass:'********',
+            apiUser:apiUser,
+            apiPass:'********'
+        });
+
+        const payload=new TextEncoder().encode(JSON.stringify(configData));
+
+        showStatus('Sending configuration...','info');
+
+        await customChar.writeValue(payload);
+
+        showStatus('Settings saved successfully. The gateway is restarting...','success');
+
+        console.log('[BLE] Configuration sent successfully.');
+
+    }catch(error){
+        console.error('[BLE] Provisioning error:',error);
+        showStatus(`Error: ${error.message}`,'error');
+    }finally{
+        button.disabled=false;
+    }
+}
+
+function showStatus(message,type){
+    const statusBox=document.getElementById('statusBox');
+    statusBox.innerText=message;
+    statusBox.className=`status ${type}`;
+}
+
+updateNetworkFields();
+</script>
+
 </body>
 </html>
